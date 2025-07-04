@@ -11,7 +11,7 @@ function LinkButton({ text, redirectUri, className = "" }: props) {
 
   return (
     <button
-      className={`btn rounded-sm transition ${className}`}
+      className={`btn p-2 pr-4 pl-4 cursor-pointer text-sm rounded-sm transition ${className}`}
       onClick={handleLogin}
     >
       {text}

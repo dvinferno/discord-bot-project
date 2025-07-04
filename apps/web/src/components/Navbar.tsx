@@ -41,6 +41,34 @@ function NavButton({
   );
 }
 
+const handleLogout = async () => {
+  try {
+    window.location.href = "http://localhost:3001/logout"; // Redirect the user
+  } catch (error) {
+    console.error("Error logging out:", error);
+  }
+};
+
+function ProfileDropdown() {
+  return (
+    <div className="py-2">
+      <a
+        href="/servers"
+        className="block px-4 py-2 text-white hover:bg-gray-700/80"
+      >
+        My Servers
+      </a>
+      <hr className="my-2 w-4/5 mx-auto border border-b-0 border-gray-600" />
+      <button
+        onClick={handleLogout}
+        className="block w-full text-left px-4 py-2 text-white hover:bg-gray-700/80"
+      >
+        Log Out
+      </button>
+    </div>
+  );
+}
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
@@ -74,6 +102,7 @@ export default function Navbar() {
             <ProfileButton
               label={user.global_name ?? user.username}
               avatarUrl={getDiscordAvatar(user)}
+              dropdownContent={<ProfileDropdown />}
             />
           ) : (
             <LinkButton
@@ -94,7 +123,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       <div
-        className={`md:hidden fixed top-16 left-0 w-full overflow-hidden transition-all duration-300 ease-in-out transform bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 z-0 ${
+        className={`md:hidden fixed top-16 left-0 w-full backdrop-blur-sm transition-all duration-150 ease-in-out transform bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 z-0 ${
           isOpen
             ? "max-h-60 opacity-100 scale-y-100"
             : "max-h-0 opacity-0 scale-y-0"
@@ -105,6 +134,7 @@ export default function Navbar() {
             <ProfileButton
               label={user.global_name ?? user.username}
               avatarUrl={getDiscordAvatar(user)}
+              dropdownContent={<ProfileDropdown />}
             />
           ) : (
             <LinkButton

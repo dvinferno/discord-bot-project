@@ -166,6 +166,7 @@ app.get("/auth/validate", async (req, res) => {
 app.get("/logout", (_, res) => {
   res.clearCookie("auth_token");
   res.clearCookie("refresh_token");
+  console.log("Clearing cookies and redirecting to frontend");
   res.redirect(FRONTEND_URL);
 });
 
