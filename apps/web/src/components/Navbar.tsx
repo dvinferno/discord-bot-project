@@ -3,19 +3,11 @@ import { useUser } from "../context/UserContext";
 
 import LinkButton from "./buttons/LinkButton";
 import ProfileButton from "./buttons/ProfileButton";
+import Logo from "./Logo";
 
 import { FaBars, FaTimes } from "react-icons/fa";
 import { DocIcon } from "./../assets/icons/DocIcon";
 import { DashIcon } from "./../assets/icons/DashIcon";
-
-function Logo() {
-  return (
-    <a href="/" className="flex items-center gap-2">
-      <img src="/src/assets/icon.png" className="h-12" alt="Bot Logo" />
-      <p className="text-xl font-bold text-white">Untitled Bot</p>
-    </a>
-  );
-}
 
 type NavButtonProps = {
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>> | React.ElementType;
@@ -92,7 +84,9 @@ export default function Navbar() {
     <>
       {/* Top Navbar */}
       <header className="fixed flex items-center justify-between h-16 px-2 w-full bg-gradient-to-r from-gray-800 via-gray-900 to-gray-950 z-10 shadow-md">
-        <Logo />
+        <a href="/">
+          <Logo label="Untitled Bot" className="h-10" />
+        </a>
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-2 items-center">
           <NavButton className="text-sm" icon={DashIcon} label="Dashboard" />
@@ -123,7 +117,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Dropdown */}
       <div
-        className={`md:hidden fixed top-16 left-0 w-full backdrop-blur-sm transition-all duration-150 ease-in-out transform bg-gradient-to-r from-gray-700 via-gray-800 to-gray-900 z-0 ${
+        className={`md:hidden fixed top-16 left-0 w-full backdrop-blur-sm transition-all duration-150 ease-in-out transform bg-gradient-to-b from-gray-700/60 via-gray-800/60 to-gray-900/10 z-0 ${
           isOpen
             ? "max-h-60 opacity-100 scale-y-100"
             : "max-h-0 opacity-0 scale-y-0"

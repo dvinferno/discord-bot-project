@@ -67,7 +67,7 @@ export default function ProfileButton({
 
       <div
         ref={dropdownRef}
-        className={`absolute right-0 mt-2 w-full rounded-sm shadow-lg z-10 bg-gray-800/60 backdrop-blur-sm transform scale-y-0 origin-top transition-transform duration-100 ease-in-out ${
+        className={`absolute right-0 mt-2 w-full rounded-sm shadow-lg z-10 bg-gray-800 transform scale-y-0 origin-top transition-transform duration-100 ease-in-out ${
           isOpen ? "max-h-60 scale-y-100" : "max-h scale-y-0"
         }`}
       >
