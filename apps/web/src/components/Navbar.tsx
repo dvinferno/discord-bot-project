@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useGuild } from "../context/GuildContext";
+import getDiscordAvatar from "../utils/getDiscordAvatar";
 
 import LinkButton from "./buttons/LinkButton";
 import ProfileButton from "./buttons/ProfileButton";
@@ -34,52 +36,13 @@ function NavButton({
   );
 }
 
-const handleLogout = async () => {
-  try {
-    window.location.href = "http://localhost:3001/api/auth/logout"; // Redirect the user
-  } catch (error) {
-    console.error("Error logging out:", error);
-  }
-};
-
-function ProfileDropdown() {
-  return (
-    <div className="py-2">
-      <Link
-        to="/servers"
-        className="block px-4 py-2 text-white hover:bg-gray-700/80"
-      >
-        My Servers
-      </Link>
-      <hr className="my-2 w-4/5 mx-auto border border-b-0 border-gray-600" />
-      <button
-        onClick={handleLogout}
-        className="block w-full text-left px-4 py-2 text-white hover:bg-gray-700/80"
-      >
-        Log Out
-      </button>
-    </div>
-  );
-}
-
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { guild } = useGuild();
   const { user } = useUser();
+  const navigate = useNavigate();
 
   const toggleNavbar = () => setIsOpen((prev) => !prev);
-
-  // Returns avatar URL or fallback based on Discord discriminator
-  const getDiscordAvatar = (user: {
-    avatar: string | null;
-    discriminator: string;
-    id: string;
-  }) => {
-    if (!user.avatar) {
-      const defaultAvatarIndex = parseInt(user.discriminator) % 5;
-      return `https://cdn.discordapp.com/embed/avatars/${defaultAvatarIndex}.png`;
-    }
-    return `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=512`;
-  };
 
   return (
     <>
@@ -90,14 +53,24 @@ export default function Navbar() {
         </Link>
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-2 items-center">
-          <NavButton className="text-sm" icon={DashIcon} label="Dashboard" />
+          <NavButton
+            className="text-sm"
+            icon={DashIcon}
+            label="Dashboard"
+            onClick={() => {
+              if (guild) {
+                navigate(`/dashboard/${guild.id}`);
+              } else {
+                navigate("/servers");
+              }
+            }}
+          />
           <NavButton className="text-sm" icon={DocIcon} label="Documentation" />
 
           {user ? (
             <ProfileButton
               label={user.global_name ?? user.username}
               avatarUrl={getDiscordAvatar(user)}
-              dropdownContent={<ProfileDropdown />}
             />
           ) : (
             <LinkButton
@@ -129,7 +102,6 @@ export default function Navbar() {
             <ProfileButton
               label={user.global_name ?? user.username}
               avatarUrl={getDiscordAvatar(user)}
-              dropdownContent={<ProfileDropdown />}
             />
           ) : (
             <LinkButton
@@ -138,7 +110,18 @@ export default function Navbar() {
               className="bg-indigo-600 hover:bg-indigo-700/80"
             />
           )}
-          <NavButton icon={DashIcon} label="Dashboard" />
+          <NavButton
+            className="text-sm"
+            icon={DashIcon}
+            label="Dashboard"
+            onClick={() => {
+              if (guild) {
+                navigate(`/dashboard/${guild.id}`);
+              } else {
+                navigate("/servers");
+              }
+            }}
+          />
           <NavButton icon={DocIcon} label="Documentation" />
         </div>
       </div>

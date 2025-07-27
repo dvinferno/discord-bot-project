@@ -1,27 +1,36 @@
 import { useEffect, useState } from "react";
 import Navbar from "./../Navbar";
 import { FaDiscord } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, redirect } from "react-router-dom";
 import Spinner from "../Spinner";
-
-type Guild = {
-  id: string;
-  name: string;
-  icon: string | null;
-};
+import { useGuild, type Guild } from "../../context/GuildContext.tsx";
+import { useUser } from "../../context/UserContext.tsx";
 
 const ServerCard: React.FC<{ server: Guild }> = ({ server }) => {
   return (
-    <button className="bg-gray-800/50 p-8 pl-16 pr-16 rounded-xl shadow-lg space-y-4 group transition-all duration-300 hover:bg-gray-800 hover:shadow-indigo-500/20 hover:-translate-y-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500">
+    <button className="cursor-pointer lg:w-64 lg:h-64 md:w-48 md:h-48 w-48 h-48 bg-gray-700/20 p-8 pl-16 pr-16 rounded-xl shadow-lg space-y-4 group transition-all duration-300 hover:bg-gray-800 hover:shadow-indigo-500/20 hover:-translate-y-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-indigo-500">
       <div className="flex flex-col items-center space-y-2">
         <img
           src={server.icon ?? undefined}
           alt={`${server.name} icon`}
-          className="w-24 h-24 rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
+          className="aspect-square rounded-full object-cover transition-transform duration-300 group-hover:scale-110"
         />
 
-        <h3 className="text-xl font-bold text-white">{server.name}</h3>
-        {/* <p className="text-sm text-gray-400">{server.memberCount.toLocaleString()} Members</p> */}
+        <h3 className="text-sm font-semibold text-white mt-2 truncate max-w-[10rem] text-center">
+          {server.name}
+        </h3>
+        <div className="flex justify-center gap-3 text-xs text-gray-400 mt-1">
+          {server.presenceCount != null && (
+            <span className="text-green-400">
+              ● {server.presenceCount.toLocaleString()} Online
+            </span>
+          )}
+          {server.memberCount != null && (
+            <span className="text-gray-300">
+              👥 {server.memberCount.toLocaleString()} Members
+            </span>
+          )}
+        </div>
       </div>
     </button>
   );
@@ -30,8 +39,15 @@ const ServerCard: React.FC<{ server: Guild }> = ({ server }) => {
 const ServerView = () => {
   const [guilds, setGuilds] = useState<Guild[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setGuild } = useGuild();
+  const { user } = useUser();
 
   useEffect(() => {
+    if (!user) {
+      window.location.href="http://localhost:3001/api/auth/discord";
+      return;
+    }
+
     fetch("http://localhost:3001/api/user/mutual-guilds", {
       credentials: "include", // send cookies
     })
@@ -90,7 +106,10 @@ const ServerView = () => {
                     <Link
                       className="flex-auto"
                       key={guild.id}
-                      to={`/dashboard`}
+                      to={`/dashboard/${guild.id}`}
+                      onClick={() => {
+                        setGuild(guild);
+                      }}
                     >
                       <ServerCard server={guild} />
                     </Link>

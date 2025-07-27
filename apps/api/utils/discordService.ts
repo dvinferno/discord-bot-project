@@ -1,7 +1,7 @@
 import { SimpleCache } from "../utils/cache";
 
 const userGuildCache = new SimpleCache<string, any[]>(5 * 60 * 1000); // 5 min TTL
-const botGuildCache = new SimpleCache<string, any[]>(5 * 60 * 1000);
+const botGuildCache = new SimpleCache<string, any[]>(1 * 60 * 1000);
 const BOT_GUILDS_CACHE_KEY = "bot_guilds";
 
 export async function getUserGuilds(accessToken: string) {
@@ -31,6 +31,30 @@ export async function getUserGuilds(accessToken: string) {
     const guilds = await res.json();
     userGuildCache.set(accessToken, guilds as userGuildCache[]);
     return guilds as userGuildCache[];
+}
+
+type GuildDetails = {
+    owner_id: string;
+    approximate_member_count?: number;
+    approximate_presence_count?: number;
+    // add other properties as needed
+    [key: string]: any;
+};
+
+async function getGuildDetails(id: string): Promise<GuildDetails | null> {
+    const res = await fetch(`https://discord.com/api/v10/guilds/${id}?with_counts=true`, {
+        headers: {
+            Authorization: `Bot ${Bun.env.DISCORD_TOKEN}`,
+        },
+    });
+
+    if (!res.ok) {
+        const error = await res.text();
+        console.error(`Failed to fetch guild ${id}:`, res.status, error);
+        return null;
+    }
+
+    return res.json() as Promise<GuildDetails>; // includes owner_id, member counts, etc.
 }
 
 export async function getBotGuilds(): Promise<{
@@ -72,24 +96,30 @@ export async function getMutualManageableGuilds(accessToken: string) {
     const botGuildIds = new Set(botGuilds.map(g => g.id));
 
     // Keep only guilds the user can manage and the bot is in
-    const mutualGuilds = userGuilds
+    const mutualGuilds = await Promise.all(userGuilds
         .filter(userGuild => {
             const perms = BigInt(userGuild.permissions);
             const canManage = (perms & 0x20n) === 0x20n; // MANAGE_GUILD
             return canManage && botGuildIds.has(userGuild.id);
         })
-        .map(userGuild => {
+        .map(async userGuild => {
             const botGuild = botGuilds.find(g => g.id === userGuild.id);
+            const details = await getGuildDetails(userGuild.id);
             const iconUrl = botGuild?.icon
                 ? `https://cdn.discordapp.com/icons/${botGuild.id}/${botGuild.icon}.png`
                 : null;
+
+            console.log(details);
 
             return {
                 id: botGuild!.id,
                 name: botGuild!.name,
                 icon: iconUrl,
+                ownerId: details?.owner_id ?? null,
+                memberCount: details?.approximate_member_count ?? null,
+                presenceCount: details?.approximate_presence_count ?? null,
             };
-        });
+        }));
 
     return mutualGuilds;
 }

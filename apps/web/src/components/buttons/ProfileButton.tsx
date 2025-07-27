@@ -1,17 +1,46 @@
 import { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
+import handleLogout from "../../utils/handleLogout";
+import { useUser } from "../../context/UserContext";
+import { useGuild } from "../../context/GuildContext";
 
 type Props = {
   className?: string;
   label?: string;
   avatarUrl?: string;
-  dropdownContent: React.ReactNode;
 };
+
+function ProfileDropdown() {
+  const { setUser } = useUser();
+  const { setGuild } = useGuild();
+
+  return (
+    <div className="py-2">
+      <Link
+        to="/servers"
+        className="block px-4 py-2 text-white hover:bg-gray-700/80"
+      >
+        My Servers
+      </Link>
+      <hr className="my-2 w-4/5 mx-auto border border-b-0 border-gray-600" />
+      <button
+        onClick={() => {
+          setUser(null); // Clear user context
+          setGuild(null); // Clear guild context
+          handleLogout();
+        }}
+        className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700/80"
+      >
+        Log Out
+      </button>
+    </div>
+  );
+}
 
 export default function ProfileButton({
   className = "",
   label,
   avatarUrl,
-  dropdownContent,
 }: Props) {
   // State to manage the dropdown's visibility
   const [isOpen, setIsOpen] = useState(false);
@@ -72,7 +101,7 @@ export default function ProfileButton({
         }`}
       >
         {/* Content of the dropdown */}
-        {dropdownContent}
+        {<ProfileDropdown />}
       </div>
     </div>
   );
