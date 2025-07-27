@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUser } from "../context/UserContext";
+import { Link } from "react-router-dom";
 
 import LinkButton from "./buttons/LinkButton";
 import ProfileButton from "./buttons/ProfileButton";
@@ -35,7 +36,7 @@ function NavButton({
 
 const handleLogout = async () => {
   try {
-    window.location.href = "http://localhost:3001/logout"; // Redirect the user
+    window.location.href = "http://localhost:3001/api/auth/logout"; // Redirect the user
   } catch (error) {
     console.error("Error logging out:", error);
   }
@@ -44,12 +45,12 @@ const handleLogout = async () => {
 function ProfileDropdown() {
   return (
     <div className="py-2">
-      <a
-        href="/servers"
+      <Link
+        to="/servers"
         className="block px-4 py-2 text-white hover:bg-gray-700/80"
       >
         My Servers
-      </a>
+      </Link>
       <hr className="my-2 w-4/5 mx-auto border border-b-0 border-gray-600" />
       <button
         onClick={handleLogout}
@@ -84,9 +85,9 @@ export default function Navbar() {
     <>
       {/* Top Navbar */}
       <header className="fixed flex items-center justify-between h-16 px-2 w-full bg-gradient-to-r from-gray-800 via-gray-900 to-gray-950 z-10 shadow-md">
-        <a href="/">
+        <Link to="/">
           <Logo label="Untitled Bot" className="h-10" />
-        </a>
+        </Link>
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-2 items-center">
           <NavButton className="text-sm" icon={DashIcon} label="Dashboard" />
@@ -101,7 +102,7 @@ export default function Navbar() {
           ) : (
             <LinkButton
               text="Login"
-              redirectUri="http://localhost:3001/auth/discord"
+              redirectUri="http://localhost:3001/api/auth/discord"
               className="bg-indigo-600 hover:bg-indigo-700/80"
             />
           )}
@@ -133,7 +134,7 @@ export default function Navbar() {
           ) : (
             <LinkButton
               text="Login"
-              redirectUri="http://localhost:3001/auth/discord"
+              redirectUri="http://localhost:3001/api/auth/discord"
               className="bg-indigo-600 hover:bg-indigo-700/80"
             />
           )}

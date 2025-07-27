@@ -33,9 +33,12 @@ export const UserProvider: React.FC<React.PropsWithChildren<{}>> = ({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch("http://localhost:3001/auth/validate", {
-          credentials: "include",
-        });
+        const response = await fetch(
+          "http://localhost:3001/api/auth/validate",
+          {
+            credentials: "include",
+          }
+        );
 
         const data = await response.json();
 

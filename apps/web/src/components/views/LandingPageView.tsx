@@ -1,19 +1,23 @@
-import React from "react";
-
 import Logo from "./../Logo";
 import Navbar from "./../Navbar";
 import FeatureCard from "./../buttons/FeatureCard";
 import { BsDoorOpen } from "react-icons/bs";
-import { FaRegEye } from "react-icons/fa";
+import { FaRegEye, FaDiscord } from "react-icons/fa";
 import { MdBarChart } from "react-icons/md";
 
+/**
+ * Renders the main landing page view for the application.
+ * This component includes a navigation bar, a hero section with a call-to-action,
+ * and a features section highlighting the bot's capabilities.
+ */
 const LandingPageView = () => {
   return (
     <div className="font-sans">
       <Navbar />
       <div className="min-h-screen flex flex-col items-center justify-center p-6">
+        {/* Hero Section */}
         <div className="text-center max-w-4xl mx-auto">
-          <div className="inline-block p-4 bg-indigo-600/30 mb-6 rounded-2xl shadow-lg">
+          <div className="inline-block p-4 bg-indigo-600/30 mb-6 mt-20 rounded-2xl shadow-lg">
             <Logo className="h-36"></Logo>
           </div>
           <h1 className="text-5xl md:text-6xl font-extrabold text-white tracking-tight">
@@ -25,12 +29,16 @@ const LandingPageView = () => {
           </p>
           <button
             onClick={() => {}}
-            className="mt-10 px-8 py-4 bg-indigo-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-indigo-700 transform transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50"
+            className="cursor-pointer mt-10 px-8 py-4 bg-indigo-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-indigo-700 transform transition-transform duration-300 hover:scale-105"
           >
-            Manage My Servers
+            <span className="flex items-center justify-center gap-3">
+              <FaDiscord className="w-7 h-7" />
+              Add to Discord
+            </span>
           </button>
         </div>
 
+        {/* Features Section */}
         <div className="max-w-7xl mx-auto mt-20 w-full">
           <h2 className="text-3xl font-bold text-center text-white mb-10">
             Features at a Glance
