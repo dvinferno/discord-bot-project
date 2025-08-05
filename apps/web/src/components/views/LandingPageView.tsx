@@ -28,7 +28,12 @@ const LandingPageView = () => {
             Discord servers with the power of AI.
           </p>
           <button
-            onClick={() => {}}
+            onClick={() => {
+              window.open(
+                "https://discord.com/oauth2/authorize?client_id=1337861308166438932",
+                "_blank"
+              );
+            }}
             className="cursor-pointer mt-10 px-8 py-4 bg-indigo-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-indigo-700 transform transition-transform duration-300 hover:scale-105"
           >
             <span className="flex items-center justify-center gap-3">

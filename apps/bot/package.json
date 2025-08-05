@@ -8,6 +8,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "discord.js": "^14.19.3"
+    "discord.js": "^14.19.3",
+    "mongodb": "^6.18.0"
   }
 }

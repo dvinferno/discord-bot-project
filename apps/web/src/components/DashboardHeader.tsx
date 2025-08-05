@@ -5,14 +5,22 @@ import ProfileButton from "./buttons/ProfileButton";
 import getDiscordAvatar from "../utils/getDiscordAvatar";
 
 interface HeaderProps {
-  currentGuild: Guild;
+  currentGuild?: Guild;
   guilds: Guild[];
   onSelectGuild: (server: Guild) => void;
 }
 
+const fallbackGuild: Guild = {
+  id: "0",
+  name: "Unknown Server",
+  icon: "",
+  memberCount: 0,
+  presenceCount: 0,
+};
+
 const DashboardHeader: React.FC<HeaderProps> = ({
-  currentGuild,
   guilds,
+  currentGuild = guilds[0] ?? fallbackGuild,
   onSelectGuild,
 }) => {
   const { user } = useUser();
@@ -34,15 +42,20 @@ const DashboardHeader: React.FC<HeaderProps> = ({
   }, []);
 
   const handleSelect = (guild: Guild) => {
+    if (!guild) return;
     if (guild.id !== currentGuild.id) {
       onSelectGuild(guild);
     }
     setIsDropdownOpen(false);
   };
 
+  if (!currentGuild) {
+    currentGuild = fallbackGuild;
+  }
+
   return (
-    <header className="fixed h-16 px-2 w-full bg-gradient-to-r from-gray-800 via-gray-900 to-gray-950 z-10 shadow-md">
-      <div className="flex items-center justify-between h-16 p-6">
+    <header className="fixed h-16 w-full bg-gradient-to-r from-gray-800 via-gray-900 to-gray-950 z-10 shadow-md">
+      <div className="flex items-center justify-between gap-x-px h-16">
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsDropdownOpen((prev) => !prev)}
@@ -51,7 +64,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
             aria-expanded={isDropdownOpen}
           >
             <img
-              src={currentGuild.icon!}
+              src={currentGuild.icon}
               alt={`${currentGuild.name} icon`}
               className="w-10 h-10 rounded-lg object-cover"
             />
@@ -155,7 +168,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center mr-68">
           <ProfileButton
             label={user.global_name ?? user.username}
             avatarUrl={getDiscordAvatar(user)}

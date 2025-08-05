@@ -9,7 +9,7 @@ import {
 export type Guild = {
   id: string;
   name: string;
-  icon: string | null;
+  icon?: string;
   memberCount?: number;
   presenceCount?: number;
 };

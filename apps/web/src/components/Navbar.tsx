@@ -38,7 +38,7 @@ function NavButton({
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const { guild } = useGuild();
+  const { guild, setGuild } = useGuild();
   const { user } = useUser();
   const navigate = useNavigate();
 
@@ -49,7 +49,7 @@ export default function Navbar() {
       {/* Top Navbar */}
       <header className="fixed flex items-center justify-between h-16 px-2 w-full bg-gradient-to-r from-gray-800 via-gray-900 to-gray-950 z-10 shadow-md">
         <Link to="/">
-          <Logo label="Untitled Bot" className="h-10" />
+          <Logo label="Untitled Bot" className="h-10 " />
         </Link>
         {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-2 items-center">
@@ -58,9 +58,10 @@ export default function Navbar() {
             icon={DashIcon}
             label="Dashboard"
             onClick={() => {
-              if (guild) {
+              if (guild && user) {
                 navigate(`/dashboard/${guild.id}`);
               } else {
+                setGuild(null); // Clear guild context
                 navigate("/servers");
               }
             }}
@@ -115,9 +116,10 @@ export default function Navbar() {
             icon={DashIcon}
             label="Dashboard"
             onClick={() => {
-              if (guild) {
+              if (guild && user) {
                 navigate(`/dashboard/${guild.id}`);
               } else {
+                setGuild(null); // Clear guild context
                 navigate("/servers");
               }
             }}

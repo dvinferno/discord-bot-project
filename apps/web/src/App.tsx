@@ -17,6 +17,7 @@ const App: React.FC = () => {
               <Route path="/" element={<LandingPageView />} />
               <Route path="/servers" element={<ServerView />} />
               <Route path="/dashboard/:id" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </GuildProvider>
         </UserProvider>

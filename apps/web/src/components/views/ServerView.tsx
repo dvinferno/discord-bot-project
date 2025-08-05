@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "./../Navbar";
 import { FaDiscord } from "react-icons/fa";
-import { Link, redirect } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Spinner from "../Spinner";
 import { useGuild, type Guild } from "../../context/GuildContext.tsx";
 import { useUser } from "../../context/UserContext.tsx";
@@ -44,7 +44,7 @@ const ServerView = () => {
 
   useEffect(() => {
     if (!user) {
-      window.location.href="http://localhost:3001/api/auth/discord";
+      window.location.href = "http://localhost:3001/api/auth/discord";
       return;
     }
 
@@ -116,6 +116,20 @@ const ServerView = () => {
                   </>
                 ))}
               </div>
+              <button
+                onClick={() => {
+                  window.open(
+                    "https://discord.com/oauth2/authorize?client_id=1337861308166438932",
+                    "_blank"
+                  );
+                }}
+                className="cursor-pointer mt-10 px-8 py-4 bg-indigo-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-indigo-700 transform transition-transform duration-300 hover:scale-105"
+              >
+                <span className="flex items-center justify-center gap-3">
+                  <FaDiscord className="w-7 h-7" />
+                  Add to Discord
+                </span>
+              </button>
             </div>
           </div>
         )}
