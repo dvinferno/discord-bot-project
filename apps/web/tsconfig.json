@@ -3,8 +3,12 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
-  ,"compilerOptions": {
-    "erasableSyntaxOnly": false
+  ],
+  "compilerOptions": {
+    "erasableSyntaxOnly": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }
