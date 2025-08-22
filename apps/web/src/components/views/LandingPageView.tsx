@@ -1,6 +1,9 @@
+// React and component imports
 import Logo from "./../Logo";
 import Navbar from "./../Navbar";
-import FeatureCard from "./../buttons/FeatureCard";
+import FeatureCard from "./../buttons/FeatureCard"; // Component for displaying features
+
+// Icon imports
 import { BsDoorOpen } from "react-icons/bs";
 import { FaRegEye, FaDiscord } from "react-icons/fa";
 import { MdBarChart } from "react-icons/md";
@@ -13,13 +16,15 @@ import { MdBarChart } from "react-icons/md";
 const LandingPageView = () => {
   return (
     <div className="font-sans">
-      <Navbar />
+      <Navbar /> {/* Navigation bar for the landing page */}
       <div className="min-h-screen flex flex-col items-center justify-center p-6">
         {/* Hero Section */}
         <div className="text-center max-w-4xl mx-auto">
+          {/* Bot Logo */}
           <div className="inline-block p-4 bg-indigo-600/30 mb-6 mt-20 rounded-2xl shadow-lg">
             <Logo className="h-36"></Logo>
           </div>
+          {/* Main Heading */}
           <h1 className="text-5xl md:text-6xl font-extrabold text-white tracking-tight">
             Welcome to <span className="text-indigo-400">Untitled Bot</span>
           </h1>
@@ -27,6 +32,7 @@ const LandingPageView = () => {
             The all-in-one solution to manage, moderate, and supercharge your
             Discord servers with the power of AI.
           </p>
+          {/* Call-to-action Button */}
           <button
             onClick={() => {
               window.open(
@@ -45,9 +51,13 @@ const LandingPageView = () => {
 
         {/* Features Section */}
         <div className="max-w-7xl mx-auto mt-20 w-full">
+          {" "}
+          {/* Container for features */}
+          {/* Section Heading */}
           <h2 className="text-3xl font-bold text-center text-white mb-10">
             Features at a Glance
           </h2>
+          {/* Grid of Feature Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
               icon={<BsDoorOpen className="w-6 h-6 text-indigo-400" />}

@@ -14,12 +14,17 @@ export type Guild = {
   presenceCount?: number;
 };
 
+// Define the shape of the context value
 type GuildContextType = {
   guild: Guild | null;
   setGuild: (guild: Guild | null) => void;
 };
 
-const GuildContext = createContext<GuildContextType | undefined>(undefined);
+// Create the GuildContext with an initial undefined value.
+// This allows us to check if the context is used outside of a provider.
+const GuildContext = createContext<GuildContextType | undefined>(
+  undefined
+);
 
 export function GuildProvider({ children }: { children: ReactNode }) {
   const [guild, setGuildState] = useState<Guild | null>(null);

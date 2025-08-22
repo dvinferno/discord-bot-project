@@ -1,10 +1,11 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, Collection } from "mongodb";
 import { initializeGuildsCollection } from "./initGuilds";
 
 const uri = Bun.env.DATABASE_URI; // or your connection string
 const client = new MongoClient(uri!);
 
 export const db = client.db(Bun.env.DATABASE_NAME);
+let guilds: Collection;
 
 export async function initializeDatabase() {
     console.log("🔧 Initializing MongoDB database...");
@@ -33,4 +34,8 @@ export async function initializeDatabase() {
 
     await initializeGuildsCollection();
 
+    guilds = db.collection("guilds");
+
 }
+
+export { guilds };

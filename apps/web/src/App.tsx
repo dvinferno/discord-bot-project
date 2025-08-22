@@ -13,11 +13,15 @@ const App: React.FC = () => {
       <BrowserRouter>
         <UserProvider>
           <GuildProvider>
+            {/* Define application routes */}
             <Routes>
+              {/* Route for the landing page */}
               <Route path="/" element={<LandingPageView />} />
+              {/* Route for displaying servers */}
               <Route path="/servers" element={<ServerView />} />
-              <Route path="/dashboard/:id" element={<Dashboard />} />
+              {/* Routes for the dashboard, with an optional ID parameter */}
               <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/:id" element={<Dashboard />} /> {/* This route should ideally come after the non-parameterized one if it's meant to be more specific */}
             </Routes>
           </GuildProvider>
         </UserProvider>

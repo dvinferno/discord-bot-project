@@ -4,8 +4,8 @@ import cookieParser from "cookie-parser";
 import apiRoutes from "./routes";
 
 const app = express();
-const port = process.env.API_PORT || 3001;
-const FRONTEND_URL = "http://localhost:5173";
+const port = Bun.env.API_PORT || 3001;
+const FRONTEND_URL = Bun.env.FRONTEND_URL || "http://localhost:5173";
 
 // ───── Middleware ─────
 app.use(

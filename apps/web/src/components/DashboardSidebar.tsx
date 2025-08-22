@@ -21,7 +21,6 @@ const NavItem: React.FC<{
     <button
       onClick={() => {
         setActiveView(view);
-        console.log(isActive);
       }}
       className={`cursor-pointer flex items-center w-full px-4 py-3 text-sm font-medium text-left rounded-lg transition-colors duration-200 ${
         isActive
@@ -47,16 +46,18 @@ const DashboardSidebar: React.FC<SidebarProps> = ({
 
   return (
     <div className="w-64 bg-gray-900/70 p-4 flex flex-col shadow-md">
+      {/* Logo and Bot Name */}
       <div className="flex items-center mb-3">
         <Link className="flex items-center" to="/">
           <div className="inline-block p-1 bg-indigo-600/70 rounded-md shadow-lg">
             <Logo label="" className="h-10" />
           </div>
           <span className="ml-4 text-xl font-semibold text-white">
-            Untitled Bot
+            Untitled Bot {/* Consider making this dynamic or a constant */}
           </span>
         </Link>
       </div>
+      {/* Navigation Links */}
       <div className="border-t border-gray-700/80 mb-4"></div>
       <nav className="flex-1 space-y-2">
         {modules.map((mod) => {
@@ -66,7 +67,7 @@ const DashboardSidebar: React.FC<SidebarProps> = ({
               key={mod.id}
               view={mod.id as View}
               activeView={activeView}
-              setActiveView={setActiveView}
+              setActiveView={setActiveView} // Pass the setActiveView function
               // @ts-ignore
               icon={<Icon className="w-5 h-5" />}
               label={mod.name}

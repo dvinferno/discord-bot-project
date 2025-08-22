@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGuild, type Guild } from "../../context/GuildContext";
+import { View } from "../../utils/types";
+import { viewRegistry } from "./modules/registry";
 import DashboardHeader from "../DashboardHeader";
 import DashboardSidebar from "../DashboardSidebar";
 import Spinner from "../Spinner";
-import { View } from "../../utils/types";
-import { viewRegistry } from "./modules/registry";
 
 const DashboardView = () => {
   const { id } = useParams();
@@ -13,30 +13,33 @@ const DashboardView = () => {
   const [loading, setLoading] = useState(true);
   const [guilds, setGuilds] = useState<Guild[]>([]);
   const [activeView, setActiveView] = useState<View>(View.Dashboard); // This state is not currently used to render the view.
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
+    // Redirect to /servers if no guild ID is present in the URL
     if (!id) {
-      navigate("/servers", { replace: true }); // redirect if no guild id
+      navigate("/servers", { replace: true });
     }
 
     const fetchGuilds = async () => {
       setLoading(true);
       try {
         const res = await fetch(
-          "http://localhost:3001/api/user/mutual-guilds",
-          {
-            credentials: "include",
-          }
+          `${process.env.API_ENDPOINT}/api/user/mutual-guilds`,
+          { credentials: "include" } // Send cookies with the request
         );
 
         const data: Guild[] = await res.json();
         setGuilds(data);
 
+        // Find the current guild from the fetched list
         const found = data.find((g) => g.id === id);
         if (found) {
           setGuild(found);
         } else {
+          // If the guild is not found or not accessible,
+          // redirect to /servers. This handles cases where the user
+          // might try to access a guild they don't manage or that doesn't exist.
           navigate("/servers", { replace: true });
         }
       } catch (err) {
@@ -100,11 +103,13 @@ const DashboardView = () => {
         ) : guild ? ( // If not loading and guild is found, render the view
           renderView()
         ) : (
+          // Display a 404 message if the guild is not found or not accessible after loading
           <div className="flex flex-col items-center justify-center h-screen space-y-4">
             <p className="text-gray-400 text-5xl p-6 text-center">
               404: Guild not found or not accessible.
             </p>
             <button
+              // Button to navigate back to the home page
               onClick={() => navigate("/")}
               className="px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
             >

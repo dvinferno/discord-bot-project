@@ -1,3 +1,4 @@
+// React hooks and components
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import handleLogout from "../../utils/handleLogout";
@@ -5,29 +6,38 @@ import { useUser } from "../../context/UserContext";
 import { useGuild } from "../../context/GuildContext";
 
 type Props = {
-  className?: string;
-  label?: string;
-  avatarUrl?: string;
+  className?: string; // Optional CSS class names for custom styling
+  label?: string; // The text label to display (e.g., username)
+  avatarUrl?: string; // The URL for the user's avatar image
 };
 
+/**
+ * Renders the dropdown menu content for the ProfileButton.
+ * It includes links to "My Servers" and a "Log Out" button.
+ */
 function ProfileDropdown() {
-  const { setUser } = useUser();
-  const { setGuild } = useGuild();
+  const { setUser } = useUser(); // Access setUser function from UserContext
+  const { setGuild } = useGuild(); // Access setGuild function from GuildContext
 
   return (
     <div className="py-2">
+      {/* Link to the "My Servers" page */}
       <Link
         to="/servers"
         className="block px-4 py-2 text-white hover:bg-gray-700/80"
       >
         My Servers
       </Link>
+      {/* Horizontal rule for separation */}
       <hr className="my-2 w-4/5 mx-auto border border-b-0 border-gray-600" />
+      {/* Log Out button */}
       <button
         onClick={() => {
-          setUser(null); // Clear user context
-          setGuild(null); // Clear guild context
-          handleLogout();
+          // Clear user and guild context on logout
+          setUser(null);
+          setGuild(null);
+          // Call the utility function to handle the actual logout process (e.g., clear cookies)
+          handleLogout(process.env.VITE_API_ENDPOINT!);
         }}
         className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-700/80"
       >
@@ -37,6 +47,15 @@ function ProfileDropdown() {
   );
 }
 
+/**
+ * A reusable button component that displays a user's avatar and label,
+ * and toggles a dropdown menu on click.
+ *
+ * @param {Object} props - The component's properties.
+ * @param {string} [props.className=""] - Optional CSS classes to apply to the button.
+ * @param {string} [props.label] - The text label to display next to the avatar.
+ * @param {string} [props.avatarUrl] - The URL for the user's avatar image.
+ */
 export default function ProfileButton({
   className = "",
   label,
@@ -44,7 +63,7 @@ export default function ProfileButton({
 }: Props) {
   // State to manage the dropdown's visibility
   const [isOpen, setIsOpen] = useState(false);
-  // Refs to the button and dropdown elements for click outside detection
+  // Refs to the button and dropdown elements for detecting clicks outside
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -55,13 +74,13 @@ export default function ProfileButton({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       // Check if the click is outside the button and dropdown
-      if (
-        buttonRef.current &&
-        !buttonRef.current.contains(event.target as Node) &&
+      const clickedOutsideButton =
+        buttonRef.current && !buttonRef.current.contains(event.target as Node);
+      const clickedOutsideDropdown =
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        // Close the dropdown
+        !dropdownRef.current.contains(event.target as Node);
+
+      if (clickedOutsideButton && clickedOutsideDropdown) {
         setIsOpen(false);
       }
     };
@@ -74,7 +93,7 @@ export default function ProfileButton({
 
   return (
     // Relative wrapper for positioning the dropdown
-    <div className="relative">
+    <div className="relative" aria-haspopup="true" aria-expanded={isOpen}>
       {/* Button to trigger the dropdown */}
       <button
         ref={buttonRef}
@@ -93,11 +112,13 @@ export default function ProfileButton({
         </div>
       </button>
       {/* Dropdown menu, conditionally rendered */}
-
       <div
         ref={dropdownRef}
-        className={`absolute right-0 mt-2 w-full rounded-sm shadow-lg z-10 bg-gray-800 transform scale-y-0 origin-top transition-transform duration-100 ease-in-out ${
-          isOpen ? "max-h-60 scale-y-100" : "max-h scale-y-0"
+        // Apply dynamic classes for animation and visibility
+        className={`absolute right-0 mt-2 w-full rounded-sm shadow-lg z-10 bg-gray-800 transform origin-top transition-transform duration-100 ease-in-out ${
+          isOpen
+            ? "scale-y-100 opacity-100"
+            : "scale-y-0 opacity-0 pointer-events-none"
         }`}
       >
         {/* Content of the dropdown */}

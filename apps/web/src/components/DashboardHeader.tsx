@@ -28,6 +28,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Close dropdown if clicked outside
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
@@ -36,11 +37,13 @@ const DashboardHeader: React.FC<HeaderProps> = ({
         setIsDropdownOpen(false);
       }
     };
-
+    // Add event listener for clicks outside the dropdown
     document.addEventListener("mousedown", handleClickOutside);
+    // Cleanup: remove event listener when component unmounts
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Handle guild selection from the dropdown
   const handleSelect = (guild: Guild) => {
     if (!guild) return;
     if (guild.id !== currentGuild.id) {
@@ -49,6 +52,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
     setIsDropdownOpen(false);
   };
 
+  // Ensure currentGuild always has a value, even if initially undefined
   if (!currentGuild) {
     currentGuild = fallbackGuild;
   }
@@ -56,8 +60,10 @@ const DashboardHeader: React.FC<HeaderProps> = ({
   return (
     <header className="fixed h-16 w-full bg-gradient-to-r from-gray-800 via-gray-900 to-gray-950 z-10 shadow-md">
       <div className="flex items-center justify-between gap-x-px h-16">
+        {/* Guild Selector */}
         <div className="relative" ref={dropdownRef}>
           <button
+            // Toggle dropdown visibility
             onClick={() => setIsDropdownOpen((prev) => !prev)}
             className="flex items-center gap-3 p-2 pr-3 pl-3 rounded-sm transition cursor-pointer"
             aria-haspopup="true"
@@ -65,6 +71,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
           >
             <img
               src={currentGuild.icon}
+              // Display current guild's icon
               alt={`${currentGuild.name} icon`}
               className="w-10 h-10 rounded-lg object-cover"
             />
@@ -73,6 +80,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
                 {currentGuild?.name}
               </h2>
               <p className="text-xs text-gray-400 truncate">
+                {/* Display online and total member counts */}
                 <span className="text-green-400">●</span>{" "}
                 {currentGuild.presenceCount!.toLocaleString()} Online
                 <span className="hidden sm:inline">
@@ -82,6 +90,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
               </p>
             </div>
             <svg
+              // Dropdown arrow icon, rotates based on dropdown state
               className={`w-5 h-5 text-gray-400 ml-3 transition-transform duration-200 ${
                 isDropdownOpen ? "rotate-180" : ""
               }`}
@@ -99,7 +108,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
             </svg>
           </button>
 
-          {/* Backdrop */}
+          {/* Mobile Backdrop for closing dropdown */}
           <div
             className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden transition-opacity duration-200 ease-out ${
               isDropdownOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -108,7 +117,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
             aria-hidden="true"
           />
 
-          {/* Dropdown */}
+          {/* Guild Dropdown Menu */}
           <div
             className={`transition-all duration-200 ease-out transform origin-top ${
               isDropdownOpen
@@ -118,12 +127,14 @@ const DashboardHeader: React.FC<HeaderProps> = ({
           >
             <div className="px-4 py-2 border-b border-gray-700">
               <p className="text-sm font-semibold text-white">Switch Server</p>
-            </div>
+            </div> {/* Dropdown header */}
+            {/* Scrollable list of guilds */}
             <div className="max-h-[60vh] md:max-h-60 overflow-y-auto">
               {guilds.map((guild) => (
                 <button
                   key={guild.id}
                   onClick={() => handleSelect(guild)}
+                  // Highlight the currently selected guild
                   className={`w-full text-left flex items-center px-4 py-3 text-sm transition-colors ${
                     guild.id === currentGuild.id
                       ? "bg-indigo-600 text-white"
@@ -131,12 +142,14 @@ const DashboardHeader: React.FC<HeaderProps> = ({
                   }`}
                 >
                   <img
+                    // Guild icon in the dropdown list
                     src={guild.icon!}
                     alt={guild.name}
                     className="w-8 h-8 rounded-lg mr-3"
                   />
                   <div className="flex-1">
                     <p className="font-semibold">{guild.name}</p>
+                    {/* Guild stats in the dropdown list */}
                     <p className="text-xs text-gray-400 truncate">
                       <span className="text-green-400">●</span>{" "}
                       {currentGuild.presenceCount!.toLocaleString()} Online
@@ -147,6 +160,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
                     </p>
                   </div>
                   {guild.id === currentGuild.id && (
+                    // Checkmark for the active guild
                     <svg
                       className="w-5 h-5 text-white"
                       fill="none"
@@ -168,6 +182,7 @@ const DashboardHeader: React.FC<HeaderProps> = ({
           </div>
         </div>
 
+        {/* User Profile Button */}
         <div className="flex items-center mr-68">
           <ProfileButton
             label={user.global_name ?? user.username}

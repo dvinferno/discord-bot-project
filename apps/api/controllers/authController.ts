@@ -10,7 +10,10 @@ type OAuth2TokenError = {
     error_description?: string;
 };
 
-const FRONTEND_URL = "http://localhost:5173";
+// Frontend URL where the user will be redirected after authentication.
+// This should ideally be configurable via environment variables.
+// eslint-disable-next-line bun/no-process-env
+const FRONTEND_URL = Bun.env.FRONTEND_URL || "http://localhost:5173";
 
 export async function startDiscordAuth(_: Request, res: Response) {
     try {
@@ -41,12 +44,23 @@ export async function startDiscordAuth(_: Request, res: Response) {
     }
 }
 
+/**
+ * Handles the callback from Discord after the user authorizes the application.
+ * Exchanges the authorization code for access and refresh tokens,
+ * sets them as secure cookies, and redirects to the frontend.
+ *
+ * @param req The Express request object, containing query parameters (code, state) and cookies.
+ * @param res The Express response object.
+ * @returns A redirect response to the frontend or an error response.
+ */
 export async function handleDiscordCallback(req: Request, res: Response) {
     const code = req.query.code as string;
-    const state = req.query.state;
+    const state = req.query.state as string;
+    const storedState = req.cookies.oauth_state; // Retrieve the state stored in the cookie.
 
-    if (!code || !state) {
-        return res.status(400).send("Invalid OAuth state.");
+    // Validate the authorization code and the state parameter for CSRF protection.
+    if (!code || !state || state !== storedState) {
+        return res.status(400).send("Invalid OAuth state or missing code.");
     }
 
     try {
@@ -114,22 +128,25 @@ export async function validateAccessToken(req: Request, res: Response) {
 
         // Step 2: If access token is invalid or expired, try to refresh
         if (userRes.status === 401 && refreshToken) {
+            // eslint-disable-next-line bun/no-process-env
             const tokenRes = await fetch("https://discord.com/api/oauth2/token", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: querystring.stringify({
-                    client_id: process.env.APP_ID,
-                    client_secret: process.env.CLIENT_SECRET,
+                    client_id: Bun.env.APP_ID,
+                    client_secret: Bun.env.CLIENT_SECRET,
                     grant_type: "refresh_token",
                     refresh_token: refreshToken,
-                    redirect_uri: process.env.DISCORD_REDIRECT_URI,
+                    redirect_uri: Bun.env.DISCORD_REDIRECT_URI,
                 }),
             });
 
+            // Parse the response from the token refresh endpoint.
             const responseData = await tokenRes.json();
 
+            // If refresh failed, log the error and throw.
             if (!tokenRes.ok) {
-                const errorData = responseData as OAuth2TokenError;
+                const errorData = responseData as OAuth2TokenError; // Cast to our error type.
                 console.error("Error from Discord token endpoint:", errorData);
                 throw new Error(
                     `Discord API error: ${errorData.error_description || errorData.error
@@ -137,17 +154,23 @@ export async function validateAccessToken(req: Request, res: Response) {
                 );
             }
 
+            // Cast the successful refresh response to the expected token result type.
             const tokenData = responseData as RESTPostOAuth2AccessTokenResult;
 
+            // If access token is still not present after refresh, something went wrong.
             if (!tokenRes.ok || !tokenData.access_token) {
                 throw new Error("Token refresh failed.");
             }
 
-            // Update cookies with new tokens
-            accessToken = tokenData.access_token;
-            res.cookie("auth_token", accessToken, { httpOnly: true });
-            res.cookie("refresh_token", tokenData.refresh_token, { httpOnly: true });
+            // Update cookies with the newly obtained access and refresh tokens.
+            // Ensure secure and httpOnly flags are consistent.
+            const cookieOptions = { httpOnly: true, sameSite: "lax", secure: Bun.env.NODE_ENV === "production" } as const;
 
+            accessToken = tokenData.access_token;
+            res.cookie("auth_token", accessToken, cookieOptions);
+            res.cookie("refresh_token", tokenData.refresh_token, cookieOptions);
+
+            // Retry user fetch with new access token
             // Retry user fetch with new access token
             userRes = await fetch("https://discord.com/api/users/@me", {
                 headers: {
@@ -155,17 +178,32 @@ export async function validateAccessToken(req: Request, res: Response) {
                 },
             });
 
-            if (!userRes.ok) throw new Error("User fetch failed after refresh");
+            if (!userRes.ok) {
+                throw new Error("User fetch failed after refresh");
+            }
+        } else if (!userRes.ok) {
+            // If the initial user fetch failed for reasons other than 401, or if 401
+            // occurred without a refresh token, then the user is not authenticated.
+            return res.status(401).json({ authenticated: false, message: "Invalid or expired token." });
         }
 
+        // If everything is successful, parse the user data and return authenticated status.
         const user = await userRes.json();
         return res.json({ authenticated: true, user });
     } catch (err) {
         console.error("Validation error:", err);
-        res.status(401).json({ authenticated: false });
+        // On any error during validation or refresh, consider the user unauthenticated.
+        res.status(401).json({ authenticated: false, message: "Authentication validation failed." });
     }
 }
 
+/**
+ * Handles user logout by clearing authentication-related cookies
+ * and redirecting the user to the frontend.
+ *
+ * @param req The Express request object.
+ * @param res The Express response object.
+ */
 export function logout(req: Request, res: Response) {
     res.clearCookie("auth_token");
     res.clearCookie("refresh_token");
